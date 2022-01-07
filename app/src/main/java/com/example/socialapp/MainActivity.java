@@ -24,6 +24,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.List;
 
+
+
 public class MainActivity extends AppCompatActivity {
 
     private LocationManager locationManager;
@@ -62,9 +64,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String returnString = connectTomcatServer("192.168.101.17:8080");
-        Toast.makeText(getApplicationContext(), returnString, Toast.LENGTH_LONG).show();
-        Log.i(getClass().getSimpleName(), "received message is: " + returnString);
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try  {
+                    //Your code goes here
+                    String returnString = connectTomcatServer("http://192.168.136.244:8080/socialappservice/servlet/HelloServlet/");
+                    Log.i(getClass().getSimpleName(), "received message is: " + returnString);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
 
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         List<String> list = locationManager.getProviders(true);
@@ -87,19 +101,20 @@ public class MainActivity extends AppCompatActivity {
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         //return "App fetch location information failed";
-
-
     }
 
     String connectTomcatServer(String addr) {
         try {
             String name = URLEncoder.encode("test", "utf-8");
-            URL url = new URL(addr + "?name=" + name);
+            URL url = new URL(addr);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
+            connection.setDoInput(true);
             connection.setConnectTimeout(15000);
             connection.setReadTimeout(10000);
+            Log.i(getClass().getSimpleName(), "apply connection start");
             connection.connect();
+            Log.i(getClass().getSimpleName(), "apply connection done");
 
             InputStream inputStream = connection.getInputStream();
             BufferedReader bufferReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
