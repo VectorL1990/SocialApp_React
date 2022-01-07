@@ -14,6 +14,14 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        String returnString = connectTomcatServer("192.168.101.17:8080");
+        Toast.makeText(getApplicationContext(), returnString, Toast.LENGTH_LONG).show();
+        Log.i(getClass().getSimpleName(), "received message is: " + returnString);
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         List<String> list = locationManager.getProviders(true);
 
@@ -65,6 +77,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+
+
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         provider = LocationManager.GPS_PROVIDER;
@@ -74,6 +88,34 @@ public class MainActivity extends AppCompatActivity {
 
         //return "App fetch location information failed";
 
+
+    }
+
+    String connectTomcatServer(String addr) {
+        try {
+            String name = URLEncoder.encode("test", "utf-8");
+            URL url = new URL(addr + "?name=" + name);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(15000);
+            connection.setReadTimeout(10000);
+            connection.connect();
+
+            InputStream inputStream = connection.getInputStream();
+            BufferedReader bufferReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
+            String line;
+            StringBuilder stringBuilder = new StringBuilder();
+            while ((line = bufferReader.readLine()) != null)
+            {
+                stringBuilder.append(line);
+            }
+            return stringBuilder.toString();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public String FetchGPSLocation() {
