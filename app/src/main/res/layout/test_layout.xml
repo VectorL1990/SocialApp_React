@@ -103,4 +103,15 @@
         app:layout_constraintStart_toStartOf="@id/verticalLayout"
         app:layout_constraintTop_toBottomOf="@id/verticalLayout" />
 
+    <Button
+        android:id="@+id/projectButton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="@+id/verticalLayout"
+        app:layout_constraintEnd_toEndOf="@+id/verticalLayout"
+        app:layout_constraintStart_toStartOf="@+id/verticalLayout"
+        app:layout_constraintTop_toTopOf="@+id/verticalLayout"
+        android:onClick="ClickButton"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
